@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const mongoose = require("mongoose");
-mongoose.connect("mongodb+srv://kane:kane123@devconnector-t4y4i.mongodb.net/api?retryWrites=true&w=majority", (err, database) => {
+mongoose.connect(<MONGO_URI>, (err, database) => {
   if (err) console.log(err);
   console.log("success");  
 });
