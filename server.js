@@ -3,17 +3,21 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+var moment = require("moment");
 
 const cors = require("cors");
 
 const mongoose = require("mongoose");
-mongoose.connect("mongodb+srv://kane:kane123@devconnector-t4y4i.mongodb.net/api?retryWrites=true&w=majority", (err, database) => {
-  if (err) console.log(err);
-  console.log("success");  
-});
+mongoose.connect(
+  "mongodb+srv://kane:kane123@devconnector-t4y4i.mongodb.net/api?retryWrites=true&w=majority",
+  (err, database) => {
+    if (err) console.log(err);
+    console.log("success");
+  }
+);
 
 app.use(cors());
- 
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -71,23 +75,20 @@ app.get("/api/exercise/users", (req, res) => {
 });
 
 app.post("/api/exercise/add", (req, res) => {
-  let today = new Date().toISOString().slice(0, 10);
+  let today;
+  if (req.body.date) {
+    today = req.body.date;
+  } else {
+    today = new Date().toISOString().slice(0, 10);
+  }
+  
   let logger;
-  if(req.body.date){
-    console.log("date is not empty");
-    logger = {
-    description: req.body.description,
-    duration: req.body.duration,
-    date: req.body.date
-  };
-  }else{
-    logger = {
+  logger = {
     description: req.body.description,
     duration: req.body.duration,
     date: today
   };
-  }
-  
+
   User.findByIdAndUpdate(
     req.body.userId,
     { $push: { log: logger } },
@@ -95,13 +96,12 @@ app.post("/api/exercise/add", (req, res) => {
   )
     .exec()
     .then(user =>
-          
       res.json({
         _id: user.id,
         username: user.username,
         description: req.body.description,
         duration: parseInt(req.body.duration),
-        date: req.body.date || today
+        date: moment(today).format('ddd MMM DD YYYY')
         // log: user.log[user.log.length - 1]
       })
     )
